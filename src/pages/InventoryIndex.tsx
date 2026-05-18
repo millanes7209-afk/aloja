@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Product } from '../types';
-import { Plus, DollarSign, Package, ShoppingCart, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Plus, DollarSign, Package, ShoppingCart, Trash2, Edit2 } from 'lucide-react';
 import NewProductModal from '../components/NewProductModal';
 import EditProductModal from '../components/EditProductModal';
 import NewPurchaseDialog from '../components/NewPurchaseDialog';
@@ -29,18 +29,7 @@ export default function InventoryIndex() {
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
-  
-  // Editing states
-  const [editingPriceIndex, setEditingPriceIndex] = useState<number | null>(null);
-  const [tempPrice, setTempPrice] = useState('');
-  
-  const [editingSubtotalIndex, setEditingSubtotalIndex] = useState<number | null>(null);
-  const [tempSubtotal, setTempSubtotal] = useState('');
-
-  const [isEditingTotal, setIsEditingTotal] = useState(false);
-  const [tempTotal, setTempTotal] = useState('');
   const [customTotal, setCustomTotal] = useState<number | null>(null);
-
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
@@ -72,7 +61,7 @@ export default function InventoryIndex() {
     } else {
       setCart([...cart, { product, quantity: 1, salePrice: defaultPrice, mode }]);
     }
-    setCustomTotal(null); // Clear custom total when modifying cart
+    setCustomTotal(null);
   };
 
   const removeFromCart = (index: number) => {
@@ -88,34 +77,6 @@ export default function InventoryIndex() {
     newCart[index].quantity = newQty;
     setCart(newCart);
     setCustomTotal(null);
-  };
-
-  const saveEditedPrice = (index: number) => {
-    const priceVal = Number(tempPrice);
-    if (isNaN(priceVal) || priceVal < 0) return;
-    const newCart = [...cart];
-    newCart[index].salePrice = priceVal;
-    setCart(newCart);
-    setEditingPriceIndex(null);
-    setCustomTotal(null);
-  };
-
-  const saveEditedSubtotal = (index: number) => {
-    const subtotalVal = Number(tempSubtotal);
-    if (isNaN(subtotalVal) || subtotalVal < 0) return;
-    const newCart = [...cart];
-    // Al cambiar el subtotal, recalculamos el precio unitario
-    newCart[index].salePrice = subtotalVal / newCart[index].quantity;
-    setCart(newCart);
-    setEditingSubtotalIndex(null);
-    setCustomTotal(null);
-  };
-
-  const saveEditedTotal = () => {
-    const totalVal = Number(tempTotal);
-    if (isNaN(totalVal) || totalVal < 0) return;
-    setCustomTotal(totalVal);
-    setIsEditingTotal(false);
   };
 
   const calculatedTotal = cart.reduce((sum, item) => sum + (item.quantity * item.salePrice), 0);
@@ -239,64 +200,54 @@ export default function InventoryIndex() {
                     </button>
                   </div>
 
-                  <div>
-                    {editingPriceIndex === index ? (
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="number"
-                          value={tempPrice}
-                          onChange={(e) => setTempPrice(e.target.value)}
-                          className="w-16 bg-background border border-border rounded px-1.5 py-0.5 text-xs text-foreground focus:outline-none focus:border-primary"
-                        />
-                        <button 
-                          onClick={() => saveEditedPrice(index)}
-                          className="bg-primary text-primary-foreground p-1 rounded hover:bg-primary/95 transition-colors"
-                        >
-                          <Check size={12} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-primary text-xs">{item.salePrice.toFixed(2)} Bs c/u</span>
-                        <button
-                          onClick={() => { setEditingPriceIndex(index); setTempPrice(item.salePrice.toString()); }}
-                          className="text-muted-foreground hover:text-foreground p-0.5 transition-colors"
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                      </div>
-                    )}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground">Precio u:</span>
+                    <input
+                      type="number"
+                      min="0" step="0.1"
+                      value={Number(item.salePrice.toFixed(2))}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val >= 0) {
+                          const newCart = [...cart];
+                          newCart[index].salePrice = val;
+                          setCart(newCart);
+                          setCustomTotal(null);
+                        } else if (e.target.value === '') {
+                          const newCart = [...cart];
+                          newCart[index].salePrice = 0;
+                          setCart(newCart);
+                          setCustomTotal(null);
+                        }
+                      }}
+                      className="w-16 bg-background border border-border rounded px-1.5 py-0.5 text-xs text-foreground font-bold focus:outline-none focus:border-primary text-right"
+                    />
                   </div>
                 </div>
 
-                <div className="flex justify-end items-center text-xs pt-1 border-t border-border/30 gap-2">
+                <div className="flex justify-end items-center text-xs pt-2 border-t border-border/30 gap-1.5">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  {editingSubtotalIndex === index ? (
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={tempSubtotal}
-                        onChange={(e) => setTempSubtotal(e.target.value)}
-                        className="w-16 bg-background border border-border rounded px-1.5 py-0.5 text-xs text-foreground focus:outline-none focus:border-primary"
-                      />
-                      <button 
-                        onClick={() => saveEditedSubtotal(index)}
-                        className="bg-primary text-primary-foreground p-1 rounded hover:bg-primary/95 transition-colors"
-                      >
-                        <Check size={12} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-foreground font-bold">{subtotal.toFixed(2)} Bs</span>
-                      <button
-                        onClick={() => { setEditingSubtotalIndex(index); setTempSubtotal(subtotal.toString()); }}
-                        className="text-muted-foreground hover:text-foreground p-0.5 transition-colors"
-                      >
-                        <Edit2 size={10} />
-                      </button>
-                    </div>
-                  )}
+                  <input
+                    type="number"
+                    min="0" step="0.1"
+                    value={Number(subtotal.toFixed(2))}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      if (!isNaN(val) && val >= 0) {
+                        const newCart = [...cart];
+                        newCart[index].salePrice = val / newCart[index].quantity;
+                        setCart(newCart);
+                        setCustomTotal(null);
+                      } else if (e.target.value === '') {
+                        const newCart = [...cart];
+                        newCart[index].salePrice = 0;
+                        setCart(newCart);
+                        setCustomTotal(null);
+                      }
+                    }}
+                    className="w-20 bg-background border border-border rounded px-2 py-1 text-sm text-foreground font-bold focus:outline-none focus:border-primary text-right"
+                  />
+                  <span className="text-foreground font-bold">Bs</span>
                 </div>
               </div>
             );
@@ -307,41 +258,28 @@ export default function InventoryIndex() {
       <div className="border-t border-border pt-4 space-y-4 shrink-0">
         <div className="flex justify-between items-center font-title">
           <span className="text-lg">Total:</span>
-          {isEditingTotal ? (
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={tempTotal}
-                onChange={(e) => setTempTotal(e.target.value)}
-                className="w-24 bg-background border border-border rounded px-2 py-1 text-lg font-bold text-foreground focus:outline-none focus:border-primary text-right"
-              />
-              <button 
-                onClick={saveEditedTotal}
-                className="bg-primary text-primary-foreground p-1.5 rounded hover:bg-primary/95 transition-colors"
-              >
-                <Check size={16} />
-              </button>
-              <button 
-                onClick={() => setIsEditingTotal(false)}
-                className="bg-muted text-foreground p-1.5 rounded hover:bg-muted/80 transition-colors border border-border"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              {customTotal !== null && (
-                <span className="text-sm line-through text-muted-foreground">{calculatedTotal.toFixed(2)}</span>
-              )}
-              <span className="text-2xl font-bold text-primary">{finalTotal.toFixed(2)} Bs</span>
-              <button
-                onClick={() => { setIsEditingTotal(true); setTempTotal(finalTotal.toString()); }}
-                className="text-muted-foreground hover:text-foreground p-1 transition-colors"
-              >
-                <Edit2 size={16} />
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {customTotal !== null && (
+              <span className="text-sm line-through text-muted-foreground" title="Total calculado">{calculatedTotal.toFixed(2)}</span>
+            )}
+            <input
+              type="number"
+              min="0" step="0.1"
+              value={customTotal !== null ? customTotal : Number(calculatedTotal.toFixed(2))}
+              onChange={(e) => {
+                if (e.target.value === '') {
+                  setCustomTotal(null);
+                } else {
+                  const val = parseFloat(e.target.value);
+                  if (!isNaN(val) && val >= 0) {
+                    setCustomTotal(val);
+                  }
+                }
+              }}
+              className="w-28 bg-background border border-primary/50 rounded px-2 py-1.5 text-xl font-bold text-primary focus:outline-none focus:border-primary text-right"
+            />
+            <span className="text-xl font-bold text-primary">Bs</span>
+          </div>
         </div>
 
         <button
