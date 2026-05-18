@@ -25,7 +25,7 @@ export default function AppLayout() {
     { name: 'Transacciones', path: '/transacciones', icon: ArrowLeftRight },
   ];
 
-  if (userData?.role !== 'empleado') {
+  if (userData?.role?.toLowerCase() !== 'empleado') {
     navItems.push({ name: 'Estadísticas', path: '/estadisticas', icon: LineChart });
     navItems.push({ name: 'Usuarios', path: '/usuarios', icon: Users });
   }

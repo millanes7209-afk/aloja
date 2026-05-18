@@ -305,7 +305,7 @@ export default function InventoryIndex() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-3xl font-title font-bold text-foreground">Productos</h1>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            {userData?.role !== 'empleado' && (
+            {userData?.role?.toLowerCase() !== 'empleado' && (
               <>
                 <button 
                   onClick={() => setIsWithdrawOpen(true)}
