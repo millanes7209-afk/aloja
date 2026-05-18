@@ -23,9 +23,12 @@ export default function AppLayout() {
   const navItems = [
     { name: 'Inventario', path: '/', icon: Package },
     { name: 'Transacciones', path: '/transacciones', icon: ArrowLeftRight },
-    { name: 'Estadísticas', path: '/estadisticas', icon: LineChart },
-    { name: 'Usuarios', path: '/usuarios', icon: Users },
   ];
+
+  if (userData?.role !== 'empleado') {
+    navItems.push({ name: 'Estadísticas', path: '/estadisticas', icon: LineChart });
+    navItems.push({ name: 'Usuarios', path: '/usuarios', icon: Users });
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">

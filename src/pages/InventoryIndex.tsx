@@ -305,20 +305,24 @@ export default function InventoryIndex() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-3xl font-title font-bold text-foreground">Productos</h1>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
-              onClick={() => setIsWithdrawOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground px-4 py-2 rounded-md hover:bg-muted transition-colors text-sm font-medium"
-            >
-              <DollarSign size={16} className="text-muted-foreground" />
-              Retirar ganancias
-            </button>
-            <button 
-              onClick={() => setIsNewProductOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-md shadow-primary/20"
-            >
-              <Plus size={16} />
-              Nuevo Producto
-            </button>
+            {userData?.role !== 'empleado' && (
+              <>
+                <button 
+                  onClick={() => setIsWithdrawOpen(true)}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground px-4 py-2 rounded-md hover:bg-muted transition-colors text-sm font-medium"
+                >
+                  <DollarSign size={16} className="text-muted-foreground" />
+                  Retirar ganancias
+                </button>
+                <button 
+                  onClick={() => setIsNewProductOpen(true)}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-md shadow-primary/20"
+                >
+                  <Plus size={16} />
+                  Nuevo Producto
+                </button>
+              </>
+            )}
           </div>
         </div>
 
