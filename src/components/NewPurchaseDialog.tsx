@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, getDoc, getDocs, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDocs, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Product } from '../types';
 import { X, Search } from 'lucide-react';

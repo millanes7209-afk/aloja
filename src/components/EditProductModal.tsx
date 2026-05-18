@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { X, Image as ImageIcon } from 'lucide-react';
@@ -60,7 +60,7 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
   const [unitsPerPack, setUnitsPerPack] = useState(product.unitsPerPack?.toString() || '');
   const [unitSalePrice, setUnitSalePrice] = useState(product.unitSalePrice?.toString() || '');
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [existingImage, setExistingImage] = useState(product.image || '');
+  const [existingImage] = useState(product.image || '');
   
   const [loading, setLoading] = useState(false);
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Transaction } from '../types';
-import { ArrowDownRight, ArrowUpRight, Clock, User as UserIcon, Calendar, Info } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, User as UserIcon, Calendar, Info } from 'lucide-react';
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
