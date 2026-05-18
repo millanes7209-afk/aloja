@@ -241,7 +241,7 @@ export default function InventoryIndex() {
                             className="flex-1 bg-primary text-primary-foreground py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1 hover:bg-primary/90 transition-colors"
                           >
                             <ShoppingCart size={14} />
-                            Paq.
+                            Vender
                           </button>
                         )}
                         {product.isDivisible && product.stockUnidades > 0 && (
@@ -310,7 +310,7 @@ export default function InventoryIndex() {
                         onClick={() => addToCart(product, 'pack')}
                         className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-md text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-colors flex items-center gap-1"
                       >
-                        <ShoppingCart size={14} /> Vender Paq.
+                        <ShoppingCart size={14} /> Vender
                       </button>
                       {product.isDivisible && (
                         <button 
@@ -349,7 +349,7 @@ export default function InventoryIndex() {
               <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
                 <ShoppingCart size={48} className="stroke-1 mb-2 opacity-50" />
                 <p className="text-sm">El carrito está vacío</p>
-                <p className="text-xs mt-1">Haz clic en "Paq." o "Suelto" en un producto para agregarlo</p>
+                <p className="text-xs mt-1">Haz clic en "Vender" o "Suelto" en un producto para agregarlo</p>
               </div>
             ) : (
               cart.map((item, index) => (

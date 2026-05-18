@@ -198,7 +198,7 @@ export default function NewPurchaseDialog({ productId, onClose, onSuccess }: New
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Costo Total Pagado (Bs)</label>
+              <label className="text-sm font-medium text-foreground">Costo Total</label>
               <input 
                 required
                 type="number" 
