@@ -110,7 +110,23 @@ export default function InventoryIndex() {
           if (item.mode === 'pack') {
             transaction.update(productRef, { stock: (productData.stock || 0) - item.quantity });
           } else {
-            transaction.update(productRef, { stockUnidades: (productData.stockUnidades || 0) - item.quantity });
+            let currentUnits = productData.stockUnidades || 0;
+            let currentPacks = productData.stock || 0;
+            let unitsPerPack = productData.unitsPerPack || 1;
+            
+            if (unitsPerPack <= 0) unitsPerPack = 1;
+
+            if (currentUnits >= item.quantity || currentPacks <= 0) {
+              transaction.update(productRef, { stockUnidades: currentUnits - item.quantity });
+            } else {
+              const neededUnits = item.quantity - currentUnits;
+              const packsToBreak = Math.min(currentPacks, Math.ceil(neededUnits / unitsPerPack));
+              
+              transaction.update(productRef, { 
+                stock: currentPacks - packsToBreak,
+                stockUnidades: currentUnits + (packsToBreak * unitsPerPack) - item.quantity
+              });
+            }
           }
         }
 
@@ -350,8 +366,11 @@ export default function InventoryIndex() {
                       <Edit2 size={14} />
                     </button>
 
-                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-background/80 backdrop-blur border border-border text-primary text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md">
-                      {product.salePrice.toFixed(2)} Bs
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-background/80 backdrop-blur border border-border text-primary text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md flex flex-col items-end">
+                      <span>{product.salePrice.toFixed(2)} Bs {product.isDivisible ? '(Paq)' : ''}</span>
+                      {product.isDivisible && (
+                        <span className="text-[9px] sm:text-[10px] text-accent-foreground">{(product.unitSalePrice || 0).toFixed(2)} Bs (Unid)</span>
+                      )}
                     </div>
                   </div>
                   
@@ -387,7 +406,7 @@ export default function InventoryIndex() {
                               Vender
                             </button>
                           )}
-                          {product.isDivisible && product.stockUnidades > 0 && (
+                          {product.isDivisible && (product.stockUnidades > 0 || product.stock > 0) && (
                             <button 
                               onClick={() => addToCart(product, 'unit')}
                               className="flex-1 bg-accent border border-primary/20 text-accent-foreground py-1.5 sm:py-2 rounded-md text-[11px] sm:text-sm font-bold flex items-center justify-center gap-1 hover:bg-accent/80 transition-colors"
